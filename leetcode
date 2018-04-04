@@ -1,24 +1,41 @@
-# big countries
+#☆big countries
 select name,population,area
 from World
 where population > 25000000 or area > 3000000
 
-#swap salary
+#☆swap salary
 update salary
 set sex = if(sex = 'f','m','f')
 
-#not boring movie
+#☆not boring movie
 select *
 from cinema
 where description !='boring' and (id%2) = 1
 order by rating desc
 
-#duplicate emails
+#☆duplicate emails
 select Email
 from Person
 group by Email
 having count(*) >1 #where过滤整体，having过滤组，where必须在group by 之前
 
-#
+#☆combine two tables
+select person.firstname as FirstName,person.lastname as LastName,address.city as City,address.state as State
+from person
+left join
+address
+on person.personid = address.personid
 
+#☆☆☆Employees Earning More Than Their Managers,
+select name as Employee
+from 
+(select a.name,a.salary as a_salary,b.salary as b_salary   #join的表不能有重复列名
+from employee as a
+left join employee as b                                   
+on a.managerid = b.id) as c                                #join的表必须赋名
+where c.a_salary > c.b_salary                              #这里不能写a.a_salary > a.b_salary,因为新的表叫c，这两个不存在了
 
+#更好的方法，select多个表
+select E1.Name 
+from Employee as E1, Employee as E2 
+where E1.ManagerId = E2.Id and E1.Salary > E2.Salary       #关联两表并筛选
