@@ -17,7 +17,7 @@ order by rating desc
 select Email
 from Person
 group by Email
-having count(*) >1 #where对数据集筛选，group by 对结果集进行筛选，where必须在group by 之前
+having count(*) >1 #where过滤整体，having过滤组，where必须在group by 之前
 
 #
 
