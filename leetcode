@@ -26,16 +26,60 @@ left join
 address
 on person.personid = address.personid
 
-#☆☆☆Employees Earning More Than Their Managers,
+#☆☆Employees Earning More Than Their Managers,
 select name as Employee
 from 
 (select a.name,a.salary as a_salary,b.salary as b_salary   #join的表不能有重复列名
 from employee as a
 left join employee as b                                   
-on a.managerid = b.id) as c                                #join的表必须赋名
+on a.managerid = b.id) as c                                #join的表用作select from对象必须赋名
 where c.a_salary > c.b_salary                              #这里不能写a.a_salary > a.b_salary,因为新的表叫c，这两个不存在了
 
 #更好的方法，select多个表
 select E1.Name 
 from Employee as E1, Employee as E2 
 where E1.ManagerId = E2.Id and E1.Salary > E2.Salary       #关联两表并筛选
+
+#☆☆Customers Who Never Order
+select name as Customers
+from(
+select a.id as a_id,a.name,b.customerid
+from customers a
+left join
+orders b
+on a.id = b.customerid) c
+where c.customerid is null                                 #is null，不能写=null
+
+#更好的方法
+SELECT A.Name from Customers A
+WHERE NOT EXISTS (SELECT * FROM Orders B WHERE A.Id = B.CustomerId)
+
+SELECT A.Name from Customers A
+LEFT JOIN Orders B on  a.Id = B.CustomerId
+WHERE b.CustomerId is NULL
+
+SELECT A.Name from Customers A
+WHERE A.Id NOT IN (SELECT B.CustomerId from Orders B)
+
+#☆☆Rising Temperature（方法很好，量表关联的查询）
+select w1.id
+from weather w1,weather w2
+where w1.temperature > w2.temperature
+and to_days(w1.date)-to_days(w2.date)=1                    #to_days返回日期在今年的天数
+
+#☆Classes More Than 5 Students
+select class from courses
+group by class
+having count(distinct student)>=5                          #distinct，列出所有不同的值，（select distinct A from）
+
+delete from email
+where id in (select id from email group by email having count(*) >1)
+and id not in (select min(id) from email group by email having count(*)>1 )   #注意，in后面的查询不能命名
+
+#☆☆☆☆Delete Duplicate Emails（多表关联删除，注意不能同时对一张表进行select和delete）(该题在本地和leetcode上运行结果不一致）
+DELETE person from person,(
+SELECT * FROM person
+where id not in (select id FROM person GROUP BY email )) as a 
+where person.id = a.id
+
+
