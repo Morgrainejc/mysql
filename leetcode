@@ -3,3 +3,22 @@ select name,population,area
 from World
 where population > 25000000 or area > 3000000
 
+#swap salary
+update salary
+set sex = if(sex = 'f','m','f')
+
+#not boring movie
+select *
+from cinema
+where description !='boring' and (id%2) = 1
+order by rating desc
+
+#duplicate emails
+select Email
+from Person
+group by Email
+having count(*) >1 #where对数据集筛选，group by 对结果集进行筛选，where必须在group by 之前
+
+#
+
+
