@@ -82,4 +82,35 @@ SELECT * FROM person
 where id not in (select id FROM person GROUP BY email )) as a 
 where person.id = a.id
 
+#更好的方法
+delete p1
+from person p1,person p2
+where p1.email = p2.email and p1.id > p2.id
 
+#查找最大值
+select *
+from employee
+where salary = (select max(salary) from employee);        #注意等号的右边不能直接写max（salary）
+
+#☆☆Second Highest Salary
+select max(salary) as SecondHighestSalary
+from (select * from employee where salary != (select max(salary) from employee)) b   #max如果不存在会返回null
+
+#更好的方法
+SELECT
+    IFNULL(
+      (SELECT DISTINCT Salary
+       FROM Employee
+       ORDER BY Salary DESC
+        LIMIT 1 OFFSET 1),
+    NULL) AS SecondHighestSalary                          #limit：读取几行；offset：从第一行往后推几行开始读取
+
+#☆☆☆☆Exchange Seats（多表关联，注意from后的select不能直接写count（*）as counts）
+select 
+(case
+    when mod(id,2) =1 and id != counts then id+1
+    when mod(id,2) =1 and id = counts then id
+    else id-1
+    end) as id,student 
+from seat,(select count(*) as counts from seat) a
+order by id asc
