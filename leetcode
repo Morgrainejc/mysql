@@ -105,7 +105,7 @@ SELECT
         LIMIT 1 OFFSET 1),
     NULL) AS SecondHighestSalary                          #limit：读取几行；offset：从第一行往后推几行开始读取
 
-#☆☆☆☆Exchange Seats（多表关联，注意from后的select不能直接写count（*）as counts）
+#☆☆☆☆☆Exchange Seats（多表关联，注意from后的select不能直接写count（*）as counts）
 select 
 (case
     when mod(id,2) =1 and id != counts then id+1
@@ -114,3 +114,25 @@ select
     end) as id,student 
 from seat,(select count(*) as counts from seat) a
 order by id asc
+
+#☆☆☆☆☆rank scores
+select 
+    Score,
+    @rank:= @rank+(@pre<>(@pre:=score)) Rank              #@定义局部变量，：=传递外部参数
+from 
+    (select score from scores ) s,
+    (select @rank:=0,@pre:=-1) init                       
+order by score DESC                                       #order by尽管是在查询结果之后运行，但是局部变量也会跟着变化（自己解释），为了避免错误，还是直接写到上面的式子中
+
+#☆☆☆☆☆consecutive numbers
+select distinct                                           #需要加distinct，否则可能会打印相同的数字
+     num as ConsecutiveNums
+from
+(select 
+    num,
+    @conse:= @conse+(@pre<>(@pre:=num)) fre
+from
+    logs,
+    (select @conse:=0,@pre:=0) a
+group by fre
+having count(*)>=3) conse
